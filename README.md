@@ -3,11 +3,10 @@
 An Express-based image processing API using Node.js and TypeScript, featuring operations for image scaling. Tested with Jasmine for reliable functionality and scalability.
 
 # Learning outcome from this project:
- Markup : * how to deal with APIs 
-          * routing using express 
-          * dealing with fileSystem
-          * testing with Jasmine
-
+* how to deal with APIs 
+* routing using express 
+* dealing with fileSystem
+* testing with Jasmine
 
 # Demo
 <img width="778" alt="image" src="https://github.com/Alhaqbani21/Image-Processing-API/assets/94962409/ed7cab75-1d7a-485d-8180-18ff45a45b9c">
