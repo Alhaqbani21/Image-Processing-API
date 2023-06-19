@@ -92,8 +92,8 @@ router.get('/', (req, res) => {
     <select name="images" id="images">
       ${options.join('\n')}
     </select>
-    <input type="text" id="widthInput" placeholder="width" />
-    <input type="text" id="heightInput" placeholder="height" />
+    <input type="number" id="widthInput" placeholder="width" />
+    <input type="number" id="heightInput" placeholder="height" />
     <button type="button" onclick="processImage()">Process</button>
   </div>
   <script>

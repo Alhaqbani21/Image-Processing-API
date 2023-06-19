@@ -29,3 +29,17 @@ export function getScaleImagePath(
   const fileName = `${id}_${dimensions}.jpg`;
   return path.join(scaleDir, fileName);
 }
+
+export function loadImage() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const image = {
+        width: 800,
+        height: 600,
+        format: 'jpg',
+      };
+
+      resolve(image);
+    }, 1000);
+  });
+}
