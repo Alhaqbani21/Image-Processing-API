@@ -35,26 +35,61 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var ImageProcess_1 = require("../utilities/ImageProcess");
-describe('Image Processing API - Resize Image', function () {
-    it('should resize the image to the specified dimensions', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var width, height, imagePath, resizedImagePromise;
+var supertest_1 = __importDefault(require("supertest"));
+var index_1 = __importDefault(require("../index"));
+describe('GET /image/:id', function () {
+    it('should return the scaled image file if it exists', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    width = 300;
-                    height = 200;
-                    imagePath = '/path/to/image.jpg';
-                    resizedImagePromise = (0, ImageProcess_1.loadImage)().then(function (resizedImage) {
-                        var image = resizedImage;
-                        expect(image.width).toEqual(width);
-                        expect(image.height).toEqual(height);
-                    });
-                    return [4 /*yield*/, resizedImagePromise];
+                case 0: return [4 /*yield*/, (0, supertest_1.default)(index_1.default).get('/image/1?width=200&height=200')];
                 case 1:
-                    _a.sent();
-                    expect().nothing();
+                    response = _a.sent();
+                    expect(response.status).toBe(200);
+                    expect(response.type).toBe('image/jpeg');
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('should return 404 if the original image is not found', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, (0, supertest_1.default)(index_1.default).get('/image/nonexistentid?width=200&height=200')];
+                case 1:
+                    response = _a.sent();
+                    expect(response.status).toBe(404);
+                    expect(response.text).toBe('Image not found');
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('should return 400 if width or height parameter is missing or invalid', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, (0, supertest_1.default)(index_1.default).get('/image/1?width=abc&height=200')];
+                case 1:
+                    response = _a.sent();
+                    expect(response.status).toBe(400);
+                    expect(response.text).toBe('Invalid width or height parameter');
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('should return 404 if there the image is not found', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, (0, supertest_1.default)(index_1.default).get('/image/invalidID?width=200&height=200')];
+                case 1:
+                    response = _a.sent();
+                    expect(response.status).toBe(404);
+                    expect(response.text).toBe('Image not found');
                     return [2 /*return*/];
             }
         });

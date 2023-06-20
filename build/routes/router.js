@@ -14,11 +14,11 @@ router.get('/placeholder', function (req, res) {
     var _a = req.query, width = _a.width, height = _a.height, style = _a.style;
     var image = (0, sharp_1.default)({
         create: {
-            width: parseInt(width) || 300,
-            height: parseInt(height) || 150,
+            width: parseInt(width, 10) || 300,
+            height: parseInt(height, 10) || 150,
             channels: 3,
-            background: style ? "#".concat(style) : '#f0f0f0',
-        },
+            background: style ? "#".concat(style) : '#f0f0f0'
+        }
     });
     image
         .toBuffer()
@@ -39,14 +39,18 @@ router.get('/image/:id', function (req, res) {
     var thumbFolderPath = path_1.default.join(__dirname, '../assets/thumb');
     if (!fs_1.default.existsSync(fullFolderPath)) {
         console.error("Full folder not found at ".concat(fullFolderPath));
-        return res.status(500).send('Internal Server Error');
+        res.status(500).send('Internal Server Error');
+        return;
     }
-    var originalImageName = fs_1.default.readdirSync(fullFolderPath).find(function (file) {
+    var originalImageName = fs_1.default
+        .readdirSync(fullFolderPath)
+        .find(function (file) {
         return file.startsWith(id);
     });
     if (!originalImageName) {
         console.error("Original image not found for ID ".concat(id));
-        return res.status(404).send('Image not found');
+        res.status(404).send('Image not found');
+        return;
     }
     var originalImagePath = path_1.default.join(fullFolderPath, originalImageName);
     var scaledImageFilename = "".concat(id, "_").concat(width, "x").concat(height, ".jpg");
@@ -54,14 +58,11 @@ router.get('/image/:id', function (req, res) {
     if (fs_1.default.existsSync(scaledImagePath)) {
         return res.sendFile(scaledImagePath);
     }
-    //to validate the width and hight parameters
-    if (!width || !height) {
-        console.error("Missing width or height parameter");
-        return res.status(400).send('Missing width or height parameter');
-    }
-    if (!(0, NumericChecker_1.isNumeric)(width) || !(0, NumericChecker_1.isNumeric)(height)) {
+    // Validate the width and height parameters
+    if (!width || !height || !(0, NumericChecker_1.isNumeric)(width) || !(0, NumericChecker_1.isNumeric)(height)) {
         console.error("Invalid width or height parameter");
-        return res.status(400).send('Invalid width or height parameter');
+        res.status(400).send('Invalid width or height parameter');
+        return;
     }
     (0, sharp_1.default)(originalImagePath)
         .resize(parseInt(width), parseInt(height))
@@ -71,6 +72,7 @@ router.get('/image/:id', function (req, res) {
             return res.status(500).send('Internal Server Error');
         }
         res.sendFile(scaledImagePath);
+        console.log('Resizing done');
     });
 });
 router.get('/', function (req, res) {

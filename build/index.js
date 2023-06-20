@@ -11,3 +11,4 @@ app.use('/', router_1.default);
 app.listen(port, function () {
     console.log("Server running on port http://localhost:".concat(port));
 });
+exports.default = app;

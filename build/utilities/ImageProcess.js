@@ -8,7 +8,7 @@ exports.loadImage = exports.getScaleImagePath = exports.getImageById = void 0;
 var path_1 = __importDefault(require("path"));
 var images = [
     { id: '1', path: '/path/to/image1.jpg' },
-    { id: '2', path: '/path/to/image2.jpg' },
+    { id: '2', path: '/path/to/image2.jpg' }
     // Add more images as needed
 ];
 function getImageById(id) {
@@ -24,12 +24,12 @@ function getScaleImagePath(id, width, height) {
 }
 exports.getScaleImagePath = getScaleImagePath;
 function loadImage() {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function (resolve) {
         setTimeout(function () {
             var image = {
                 width: 800,
                 height: 600,
-                format: 'jpg',
+                format: 'jpg'
             };
             resolve(image);
         }, 1000);

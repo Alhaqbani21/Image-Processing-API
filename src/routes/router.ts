@@ -86,6 +86,7 @@ router.get(
                 }
 
                 res.sendFile(scaledImagePath);
+                console.log('Resizing done');
             });
     }
 );
