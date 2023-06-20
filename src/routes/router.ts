@@ -7,90 +7,97 @@ import { isNumeric } from '../utilities/NumericChecker';
 
 const router = express.Router();
 
-router.get('/placeholder', (req, res) => {
-  const { width, height, style } = req.query;
+router.get(
+    '/placeholder',
+    (req: express.Request, res: express.Response): void => {
+        const { width, height, style } = req.query;
 
-  const image = sharp({
-    create: {
-      width: parseInt(width as string) || 300,
-      height: parseInt(height as string) || 150,
-      channels: 3,
-      background: style ? `#${style}` : '#f0f0f0',
-    },
-  });
+        const image = sharp({
+            create: {
+                width: parseInt(width as string, 10) || 300,
+                height: parseInt(height as string, 10) || 150,
+                channels: 3,
+                background: style ? `#${style}` : '#f0f0f0'
+            }
+        });
 
-  image
-    .toBuffer()
-    .then((buffer) => {
-      res.set('Content-Type', 'image/jpeg');
-      res.send(buffer);
-    })
-    .catch((error) => {
-      console.error('Error generating placeholder image:', error);
-      res.status(500).send('Internal Server Error');
-    });
-});
+        image
+            .toBuffer()
+            .then((buffer: Buffer) => {
+                res.set('Content-Type', 'image/jpeg');
+                res.send(buffer);
+            })
+            .catch((error: Error) => {
+                console.error('Error generating placeholder image:', error);
+                res.status(500).send('Internal Server Error');
+            });
+    }
+);
 
-router.get('/image/:id', (req, res) => {
-  const { id } = req.params;
-  const width = req.query.width as string;
-  const height = req.query.height as string;
+router.get(
+    '/image/:id',
+    (req: express.Request, res: express.Response): void => {
+        const { id } = req.params;
+        const width = req.query.width as string;
+        const height = req.query.height as string;
 
-  const fullFolderPath = path.join(__dirname, '../assets/full');
-  const thumbFolderPath = path.join(__dirname, '../assets/thumb');
+        const fullFolderPath = path.join(__dirname, '../assets/full');
+        const thumbFolderPath = path.join(__dirname, '../assets/thumb');
 
-  if (!fs.existsSync(fullFolderPath)) {
-    console.error(`Full folder not found at ${fullFolderPath}`);
-    return res.status(500).send('Internal Server Error');
-  }
+        if (!fs.existsSync(fullFolderPath)) {
+            console.error(`Full folder not found at ${fullFolderPath}`);
+            res.status(500).send('Internal Server Error');
+            return;
+        }
 
-  const originalImageName = fs.readdirSync(fullFolderPath).find((file) => {
-    return file.startsWith(id);
-  });
+        const originalImageName = fs
+            .readdirSync(fullFolderPath)
+            .find((file) => {
+                return file.startsWith(id);
+            });
 
-  if (!originalImageName) {
-    console.error(`Original image not found for ID ${id}`);
-    return res.status(404).send('Image not found');
-  }
+        if (!originalImageName) {
+            console.error(`Original image not found for ID ${id}`);
+            res.status(404).send('Image not found');
+            return;
+        }
 
-  const originalImagePath = path.join(fullFolderPath, originalImageName);
-  const scaledImageFilename = `${id}_${width}x${height}.jpg`;
-  const scaledImagePath = path.join(thumbFolderPath, scaledImageFilename);
+        const originalImagePath = path.join(fullFolderPath, originalImageName);
+        const scaledImageFilename = `${id}_${width}x${height}.jpg`;
+        const scaledImagePath = path.join(thumbFolderPath, scaledImageFilename);
 
-  if (fs.existsSync(scaledImagePath)) {
-    return res.sendFile(scaledImagePath);
-  }
+        if (fs.existsSync(scaledImagePath)) {
+            return res.sendFile(scaledImagePath);
+        }
 
-  //to validate the width and hight parameters
-  if (!width || !height) {
-    console.error(`Missing width or height parameter`);
-    return res.status(400).send('Missing width or height parameter');
-  }
-  if (!isNumeric(width) || !isNumeric(height)) {
-    console.error(`Invalid width or height parameter`);
-    return res.status(400).send('Invalid width or height parameter');
-  }
+        // Validate the width and height parameters
+        if (!width || !height || !isNumeric(width) || !isNumeric(height)) {
+            console.error(`Invalid width or height parameter`);
+            res.status(400).send('Invalid width or height parameter');
+            return;
+        }
 
-  sharp(originalImagePath)
-    .resize(parseInt(width), parseInt(height))
-    .toFile(scaledImagePath, (error) => {
-      if (error) {
-        console.error('Error resizing and saving image:', error);
-        return res.status(500).send('Internal Server Error');
-      }
+        sharp(originalImagePath)
+            .resize(parseInt(width), parseInt(height))
+            .toFile(scaledImagePath, (error: Error) => {
+                if (error) {
+                    console.error('Error resizing and saving image:', error);
+                    return res.status(500).send('Internal Server Error');
+                }
 
-      res.sendFile(scaledImagePath);
-    });
-});
+                res.sendFile(scaledImagePath);
+            });
+    }
+);
 
 router.get('/', (req, res) => {
-  const fileNames = getFileNames();
+    const fileNames = getFileNames();
 
-  const options = fileNames.map((fileName) => {
-    return `<option value="${fileName}">${fileName}</option>`;
-  });
+    const options = fileNames.map((fileName) => {
+        return `<option value="${fileName}">${fileName}</option>`;
+    });
 
-  const html = `<div
+    const html = `<div
     style="
       margin: 0 auto;
       border: solid 3px red;
@@ -122,7 +129,7 @@ router.get('/', (req, res) => {
     }
   </script>`;
 
-  res.send(html);
+    res.send(html);
 });
 
 export default router;

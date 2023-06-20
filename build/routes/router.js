@@ -35,8 +35,8 @@ router.get('/image/:id', function (req, res) {
     var id = req.params.id;
     var width = req.query.width;
     var height = req.query.height;
-    var fullFolderPath = path_1.default.join(__dirname, 'assets/full');
-    var thumbFolderPath = path_1.default.join(__dirname, 'assets/thumb');
+    var fullFolderPath = path_1.default.join(__dirname, '../assets/full');
+    var thumbFolderPath = path_1.default.join(__dirname, '../assets/thumb');
     if (!fs_1.default.existsSync(fullFolderPath)) {
         console.error("Full folder not found at ".concat(fullFolderPath));
         return res.status(500).send('Internal Server Error');

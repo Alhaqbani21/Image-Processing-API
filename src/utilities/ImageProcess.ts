@@ -3,43 +3,43 @@
 import path from 'path';
 
 interface Image {
-  id: string;
-  path: string;
+    id: string;
+    path: string;
 }
 
 const images: Image[] = [
-  { id: '1', path: '/path/to/image1.jpg' },
-  { id: '2', path: '/path/to/image2.jpg' },
-  // Add more images as needed
+    { id: '1', path: '/path/to/image1.jpg' },
+    { id: '2', path: '/path/to/image2.jpg' }
+    // Add more images as needed
 ];
 
 export function getImageById(id: string): string | undefined {
-  const image = images.find((img) => img.id === id);
-  return image ? image.path : undefined;
+    const image = images.find((img) => img.id === id);
+    return image ? image.path : undefined;
 }
 
 const scaleDir = path.join(__dirname, 'scaled');
 
 export function getScaleImagePath(
-  id: string,
-  width: string | undefined,
-  height: string | undefined
+    id: string,
+    width: string | undefined,
+    height: string | undefined
 ): string {
-  const dimensions = `${width}x${height}`;
-  const fileName = `${id}_${dimensions}.jpg`;
-  return path.join(scaleDir, fileName);
+    const dimensions = `${width}x${height}`;
+    const fileName = `${id}_${dimensions}.jpg`;
+    return path.join(scaleDir, fileName);
 }
 
 export function loadImage() {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const image = {
-        width: 800,
-        height: 600,
-        format: 'jpg',
-      };
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            const image = {
+                width: 800,
+                height: 600,
+                format: 'jpg'
+            };
 
-      resolve(image);
-    }, 1000);
-  });
+            resolve(image);
+        }, 1000);
+    });
 }
