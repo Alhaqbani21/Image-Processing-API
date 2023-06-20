@@ -3,6 +3,7 @@ import sharp from 'sharp';
 import fs from 'fs';
 import path from 'path';
 import { getFileNames } from '../utilities/nameImages';
+import { isNumeric } from '../utilities/NumericChecker';
 
 const router = express.Router();
 
@@ -32,7 +33,8 @@ router.get('/placeholder', (req, res) => {
 
 router.get('/image/:id', (req, res) => {
   const { id } = req.params;
-  const { width, height } = req.query;
+  const width = req.query.width as string;
+  const height = req.query.height as string;
 
   const fullFolderPath = path.join(__dirname, '../assets/full');
   const thumbFolderPath = path.join(__dirname, '../assets/thumb');
@@ -52,13 +54,25 @@ router.get('/image/:id', (req, res) => {
   }
 
   const originalImagePath = path.join(fullFolderPath, originalImageName);
-  const scaledImagePath = path.join(
-    thumbFolderPath,
-    `${id}_${width}x${height}.jpg`
-  );
+  const scaledImageFilename = `${id}_${width}x${height}.jpg`;
+  const scaledImagePath = path.join(thumbFolderPath, scaledImageFilename);
+
+  if (fs.existsSync(scaledImagePath)) {
+    return res.sendFile(scaledImagePath);
+  }
+
+  //to validate the width and hight parameters
+  if (!width || !height) {
+    console.error(`Missing width or height parameter`);
+    return res.status(400).send('Missing width or height parameter');
+  }
+  if (!isNumeric(width) || !isNumeric(height)) {
+    console.error(`Invalid width or height parameter`);
+    return res.status(400).send('Invalid width or height parameter');
+  }
 
   sharp(originalImagePath)
-    .resize(parseInt(width as string), parseInt(height as string))
+    .resize(parseInt(width), parseInt(height))
     .toFile(scaledImagePath, (error) => {
       if (error) {
         console.error('Error resizing and saving image:', error);

@@ -8,6 +8,7 @@ var sharp_1 = __importDefault(require("sharp"));
 var fs_1 = __importDefault(require("fs"));
 var path_1 = __importDefault(require("path"));
 var nameImages_1 = require("../utilities/nameImages");
+var NumericChecker_1 = require("../utilities/NumericChecker");
 var router = express_1.default.Router();
 router.get('/placeholder', function (req, res) {
     var _a = req.query, width = _a.width, height = _a.height, style = _a.style;
@@ -32,9 +33,10 @@ router.get('/placeholder', function (req, res) {
 });
 router.get('/image/:id', function (req, res) {
     var id = req.params.id;
-    var _a = req.query, width = _a.width, height = _a.height;
-    var fullFolderPath = path_1.default.join(__dirname, '../assets/full');
-    var thumbFolderPath = path_1.default.join(__dirname, '../assets/thumb');
+    var width = req.query.width;
+    var height = req.query.height;
+    var fullFolderPath = path_1.default.join(__dirname, 'assets/full');
+    var thumbFolderPath = path_1.default.join(__dirname, 'assets/thumb');
     if (!fs_1.default.existsSync(fullFolderPath)) {
         console.error("Full folder not found at ".concat(fullFolderPath));
         return res.status(500).send('Internal Server Error');
@@ -47,7 +49,20 @@ router.get('/image/:id', function (req, res) {
         return res.status(404).send('Image not found');
     }
     var originalImagePath = path_1.default.join(fullFolderPath, originalImageName);
-    var scaledImagePath = path_1.default.join(thumbFolderPath, "".concat(id, "_").concat(width, "x").concat(height, ".jpg"));
+    var scaledImageFilename = "".concat(id, "_").concat(width, "x").concat(height, ".jpg");
+    var scaledImagePath = path_1.default.join(thumbFolderPath, scaledImageFilename);
+    if (fs_1.default.existsSync(scaledImagePath)) {
+        return res.sendFile(scaledImagePath);
+    }
+    //to validate the width and hight parameters
+    if (!width || !height) {
+        console.error("Missing width or height parameter");
+        return res.status(400).send('Missing width or height parameter');
+    }
+    if (!(0, NumericChecker_1.isNumeric)(width) || !(0, NumericChecker_1.isNumeric)(height)) {
+        console.error("Invalid width or height parameter");
+        return res.status(400).send('Invalid width or height parameter');
+    }
     (0, sharp_1.default)(originalImagePath)
         .resize(parseInt(width), parseInt(height))
         .toFile(scaledImagePath, function (error) {
