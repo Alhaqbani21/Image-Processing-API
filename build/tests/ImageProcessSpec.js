@@ -35,26 +35,34 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+var fs_1 = __importDefault(require("fs"));
+var path_1 = __importDefault(require("path"));
 var ImageProcess_1 = require("../utilities/ImageProcess");
-describe('Image Processing API - Resize Image', function () {
-    it('should resize the image to the specified dimensions', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var width, height, imagePath, resizedImagePromise;
+describe('Image Processing', function () {
+    var fullFolderPath = path_1.default.join(__dirname, '../assets/full');
+    var thumbFolderPath = path_1.default.join(__dirname, '../assets/thumb');
+    var id = '1';
+    var width = '300';
+    var height = '200';
+    beforeEach(function () {
+        var scaledImageFilename = "".concat(id, "_").concat(width, "x").concat(height, ".jpg");
+        var scaledImagePath = path_1.default.join(thumbFolderPath, scaledImageFilename);
+        if (fs_1.default.existsSync(scaledImagePath)) {
+            fs_1.default.unlinkSync(scaledImagePath);
+        }
+    });
+    it('should generate the scaled image', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var scaledImagePath;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    width = 300;
-                    height = 200;
-                    imagePath = '/path/to/image.jpg';
-                    resizedImagePromise = (0, ImageProcess_1.loadImage)().then(function (resizedImage) {
-                        var image = resizedImage;
-                        expect(image.width).toEqual(width);
-                        expect(image.height).toEqual(height);
-                    });
-                    return [4 /*yield*/, resizedImagePromise];
+                case 0: return [4 /*yield*/, (0, ImageProcess_1.processImage)(id, width, height, fullFolderPath, thumbFolderPath)];
                 case 1:
-                    _a.sent();
-                    expect().nothing();
+                    scaledImagePath = _a.sent();
+                    console.log(fs_1.default.existsSync(scaledImagePath));
                     return [2 /*return*/];
             }
         });

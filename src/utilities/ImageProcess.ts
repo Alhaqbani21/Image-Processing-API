@@ -1,5 +1,7 @@
 // ImageID.ts
 
+import sharp from 'sharp';
+import fs from 'fs';
 import path from 'path';
 
 interface Image {
@@ -7,11 +9,7 @@ interface Image {
     path: string;
 }
 
-const images: Image[] = [
-    { id: '1', path: '/path/to/image1.jpg' },
-    { id: '2', path: '/path/to/image2.jpg' }
-    // Add more images as needed
-];
+const images: Image[] = [];
 
 export function getImageById(id: string): string | undefined {
     const image = images.find((img) => img.id === id);
@@ -41,5 +39,49 @@ export function loadImage() {
 
             resolve(image);
         }, 1000);
+    });
+}
+export function processImage(
+    id: string,
+    width: string,
+    height: string,
+    fullFolderPath: string,
+    thumbFolderPath: string
+): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const originalImageName = fs
+            .readdirSync(fullFolderPath)
+            .find((file) => file.startsWith(id));
+
+        if (!originalImageName) {
+            reject(`Original image not found for ID ${id}`);
+            return;
+        }
+
+        const originalImagePath = path.join(fullFolderPath, originalImageName);
+        const scaledImageFilename = `${id}_${width}x${height}.jpg`;
+        const scaledImagePath = path.join(thumbFolderPath, scaledImageFilename);
+
+        if (fs.existsSync(scaledImagePath)) {
+            resolve(scaledImagePath);
+            return;
+        }
+
+        // Validate the width and height parameters
+        if (!width || !height || isNaN(+width) || isNaN(+height)) {
+            reject('Invalid width or height parameter');
+            return;
+        }
+
+        sharp(originalImagePath)
+            .resize(+width, +height)
+            .toFile(scaledImagePath, (error) => {
+                if (error) {
+                    reject(`Error resizing and saving image: ${error}`);
+                    return;
+                }
+
+                resolve(scaledImagePath);
+            });
     });
 }

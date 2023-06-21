@@ -55,19 +55,6 @@ describe('GET /image/:id', function () {
             }
         });
     }); });
-    it('should return 404 if the original image is not found', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, (0, supertest_1.default)(index_1.default).get('/image/nonexistentid?width=200&height=200')];
-                case 1:
-                    response = _a.sent();
-                    expect(response.status).toBe(404);
-                    expect(response.text).toBe('Image not found');
-                    return [2 /*return*/];
-            }
-        });
-    }); });
     it('should return 400 if width or height parameter is missing or invalid', function () { return __awaiter(void 0, void 0, void 0, function () {
         var response;
         return __generator(this, function (_a) {

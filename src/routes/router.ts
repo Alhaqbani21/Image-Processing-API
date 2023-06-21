@@ -2,6 +2,7 @@ import express from 'express';
 import sharp from 'sharp';
 import fs from 'fs';
 import path from 'path';
+import { processImage } from '../utilities/ImageProcess';
 import { getFileNames } from '../utilities/nameImages';
 import { isNumeric } from '../utilities/NumericChecker';
 
@@ -36,7 +37,7 @@ router.get(
 
 router.get(
     '/image/:id',
-    (req: express.Request, res: express.Response): void => {
+    async (req: express.Request, res: express.Response): Promise<void> => {
         const { id } = req.params;
         const width = req.query.width as string;
         const height = req.query.height as string;
@@ -62,7 +63,6 @@ router.get(
             return;
         }
 
-        const originalImagePath = path.join(fullFolderPath, originalImageName);
         const scaledImageFilename = `${id}_${width}x${height}.jpg`;
         const scaledImagePath = path.join(thumbFolderPath, scaledImageFilename);
 
@@ -77,17 +77,21 @@ router.get(
             return;
         }
 
-        sharp(originalImagePath)
-            .resize(parseInt(width), parseInt(height))
-            .toFile(scaledImagePath, (error: Error) => {
-                if (error) {
-                    console.error('Error resizing and saving image:', error);
-                    return res.status(500).send('Internal Server Error');
-                }
+        try {
+            const scaledImagePath = await processImage(
+                id,
+                width,
+                height,
+                fullFolderPath,
+                thumbFolderPath
+            );
 
-                res.sendFile(scaledImagePath);
-                console.log('Resizing done');
-            });
+            res.sendFile(scaledImagePath);
+            console.log('Resizing done');
+        } catch (error) {
+            console.error('Error resizing and saving image:', error);
+            res.status(500).send('Internal Server Error');
+        }
     }
 );
 
