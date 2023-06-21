@@ -1,5 +1,6 @@
-# Image-Processing-API
+# Image-Processing-API 
 
+# My first project at Udacity 
 An Express-based image processing API using Node.js and TypeScript, featuring operations for image scaling. Tested with Jasmine for reliable functionality and scalability.
 
 # Learning outcome from this project:
